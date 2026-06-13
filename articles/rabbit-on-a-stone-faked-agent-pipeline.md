@@ -18,7 +18,9 @@ This is the story of how we proved that, and how we rebuilt it so the stone coul
 
 ## The setup
 
-I maintain a small "AI org" bootstrap: a pack of role specifications, JSON schemas, and scripts that let a controller orchestrate a pipeline of specialized agents — designers, an aufheben step that synthesizes one implementation contract, an implementer, and an adversarial reviewer called **Linon** whose only job is to try to break the work before it merges.
+I maintain a small "AI org" bootstrap: a pack of role specifications, JSON schemas, and scripts that let a controller orchestrate a pipeline of specialized agents — designers, an aufheben step that synthesizes one implementation contract, an implementer, and an adversarial reviewer called **Linon**.
+
+About that name. Take a certain famously blunt Finnish kernel maintainer — the one who reviews patches by explaining, at length and in public, exactly why your code is garbage and you should feel bad. Keep the allergy to sloppiness and the zero patience for "it works on my machine." Subtract the part where he is a real person whose opinion of you is now permanent. What's left is Linon. Its entire job is to read a diff and tell you, with receipts, why it is wrong — and unlike its namesake, it will do it a thousand times a day without getting tired or getting sued.
 
 I had asked an AI controller (a different model) to produce a *Codex-only* variant of this pack and, as a demo, to use a "RetroGamer" UI profile to generate a tiny gacha demo through the agent flow.
 
@@ -98,6 +100,8 @@ The mechanical gate passed. But the adversarial reviewer, doing the *semantic* j
 > The `inventory_commit` guard checks for item payload, rarity token, and prior item identity — but it never checks `draw_committed`. Inventory can be awarded without a successful draw.
 
 That is a real bug. A guard that does not guard. The kind of thing no schema and no regex will ever catch, because the code is structurally perfect — it just does the wrong thing.
+
+This is the exact category of defect Linon exists for, and the moment it earned its name. The code compiled. The tests passed. The structure was immaculate. And it would have happily handed out loot for free. Somewhere, a Finnish man felt a disturbance in the Force and did not know why.
 
 The implementer fixed it (a `missing_draw_commit` guard before the inventory mutation). And then — NN1 again — I did not trust that the fix worked. I attacked the guard myself: tried to reach the inventory commit without a draw, and watched it correctly emit `guard_failure: missing_draw_commit` with `inventory_mutated: false`.
 
