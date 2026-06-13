@@ -1,0 +1,31 @@
+name: Publish dev.to articles
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "articles/**/*.md"
+      - "scripts/publish-dev.to.mjs"
+      - ".github/workflows/publish-dev.to.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Publish or update dev.to articles
+        run: node scripts/publish-dev.to.mjs
+        env:
+          DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
