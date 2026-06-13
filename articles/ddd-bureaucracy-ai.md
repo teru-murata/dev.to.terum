@@ -1,6 +1,7 @@
 ---
 title: DDD Is Not Dying. Cargo-Cult DDD Is.
 slug_title: ddd-cargo-cult-ddd
+devto_id: 3894348
 published: false
 description: AI will not kill meaningful domain modeling. It will expose the economic rationale behind ceremonial architecture.
 tags: ai, architecture, ddd, engineeringmanagement

@@ -2,6 +2,7 @@
 
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 
 const root = process.cwd();
 const articlesDir = path.join(root, "articles");
@@ -127,7 +128,7 @@ function payloadFor(filePath, parsed) {
   };
 }
 
-async function devToFetch(pathname, options = {}) {
+async function devToFetch(pathname, options = {}, attempt = 1) {
   const response = await fetch(`https://dev.to/api${pathname}`, {
     ...options,
     headers: {
@@ -150,6 +151,14 @@ async function devToFetch(pathname, options = {}) {
   }
 
   if (!response.ok) {
+    const retryable = response.status === 429 || response.status >= 500;
+    if (retryable && attempt < 5) {
+      const retryAfter = Number(response.headers.get("retry-after"));
+      const delayMs = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter * 1000 : attempt * 3000;
+      console.warn(`${options.method ?? "GET"} ${pathname} failed with ${response.status}; retrying in ${delayMs}ms.`);
+      await sleep(delayMs);
+      return devToFetch(pathname, options, attempt + 1);
+    }
     throw new Error(`${options.method ?? "GET"} ${pathname} failed: ${response.status} ${JSON.stringify(json)}`);
   }
   return json;
