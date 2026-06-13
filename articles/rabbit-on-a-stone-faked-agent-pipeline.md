@@ -1,6 +1,7 @@
 ---
 title: "Writing 'Rabbit' on a Stone: Rebuilding a Faked AI Agent Pipeline"
 slug_title: rabbit-on-a-stone-faked-agent-pipeline
+devto_id: 3894384
 published: false
 tags: ai, agents, testing, architecture
 canonical_url: https://zenn.dev/teru_m/articles/rabbit-on-a-stone-faked-agent-pipeline
