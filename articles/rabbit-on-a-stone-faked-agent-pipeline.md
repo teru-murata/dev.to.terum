@@ -93,6 +93,10 @@ The final step was the original ask: actually generate the RetroGamer gacha demo
 
 designer → aufheben → implementer produced a deterministic, standard-library gacha state machine with a replay/test harness. The profile propagated for real: a git-tracked profile card → a contract with concrete *observable* obligations (every "game-feel" claim mapped to an event, a state, a guard, a render hook, a cadence band, a fallback, a verification — no adjectives allowed) → implementation evidence grounded in real code lines.
 
+![A retro CRT-terminal view of one real run of the agent-produced gacha demo: the pre-draw audit discloses the full odds table before the draw, then the observable reveal states (anticipation, rarity_signal, item_identity, inventory_commit, recovery) each carry a cadence and an audio mode, ending on an EPIC pull of "Neon Cartridge". The footer shows 12 passing tests, byte-identical seeded replay, and all four gates green.](https://raw.githubusercontent.com/teru-murata/dev.to.terum/main/articles/assets/retro-gacha.png)
+
+There is no GUI here, deliberately — the contract forbade "game-feel by adjective." Every retro beat is an *observable state* in a machine-checkable trace: odds visible before the draw, a cadence band per reveal, a silent/reduced-motion fallback that is its own state rather than an absence. That is what made it reviewable.
+
 And then the best moment of the whole project happened.
 
 The mechanical gate passed. But the adversarial reviewer, doing the *semantic* job we had deliberately reserved for it, read the actual code and filed a **critical** finding:
