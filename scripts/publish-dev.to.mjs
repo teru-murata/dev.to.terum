@@ -96,12 +96,20 @@ function assertSlugTitle(filePath, slugTitle) {
   }
 }
 
+function assertDevtoId(filePath, devtoId) {
+  if (devtoId == null) return;
+  if (!/^[0-9]+$/.test(String(devtoId))) {
+    throw new Error(`${filePath}: devto_id must be a numeric dev.to article id`);
+  }
+}
+
 function payloadFor(filePath, parsed) {
   const { data, body } = parsed;
   if (!data.title) throw new Error(`${filePath}: title is required`);
   if (!data.canonical_url) throw new Error(`${filePath}: canonical_url is required`);
   assertAsciiTitle(filePath, data.title);
   assertSlugTitle(filePath, data.slug_title);
+  assertDevtoId(filePath, data.devto_id);
 
   return {
     article: {
@@ -115,6 +123,7 @@ function payloadFor(filePath, parsed) {
       main_image: data.main_image ?? undefined,
     },
     slugTitle: data.slug_title ?? null,
+    devtoId: data.devto_id ?? null,
   };
 }
 
@@ -146,17 +155,6 @@ async function devToFetch(pathname, options = {}) {
   return json;
 }
 
-async function existingArticlesByCanonicalUrl() {
-  const articles = await devToFetch("/articles/me/all?per_page=1000");
-  const byCanonical = new Map();
-  for (const article of articles ?? []) {
-    if (article.canonical_url) {
-      byCanonical.set(article.canonical_url, article);
-    }
-  }
-  return byCanonical;
-}
-
 const files = await listMarkdownFiles(articlesDir);
 if (files.length === 0) {
   console.log("No dev.to article files found.");
@@ -178,12 +176,11 @@ for (const file of files) {
 if (dryRun) {
   for (const item of planned) {
     const slugText = item.payload.slugTitle ? ` slug_title=${item.payload.slugTitle}` : "";
-    console.log(`[dry-run] ${path.relative(root, item.file)} -> ${item.payload.article.title}${slugText}`);
+    const idText = item.payload.devtoId ? ` devto_id=${item.payload.devtoId}` : "";
+    console.log(`[dry-run] ${path.relative(root, item.file)} -> ${item.payload.article.title}${slugText}${idText}`);
   }
   process.exit(0);
 }
-
-const existingByCanonical = await existingArticlesByCanonicalUrl();
 
 function logResult(action, relative, article, fallbackUrl) {
   const url = article.url ?? fallbackUrl;
@@ -199,15 +196,14 @@ function logResult(action, relative, article, fallbackUrl) {
 
 for (const item of planned) {
   const relative = path.relative(root, item.file);
-  const canonicalUrl = item.payload.article.canonical_url;
-  const existing = existingByCanonical.get(canonicalUrl);
+  const fallbackUrl = item.payload.article.canonical_url;
 
-  if (existing) {
-    const updated = await devToFetch(`/articles/${existing.id}`, {
+  if (item.payload.devtoId) {
+    const updated = await devToFetch(`/articles/${item.payload.devtoId}`, {
       method: "PUT",
       body: JSON.stringify({ article: item.payload.article }),
     });
-    logResult("Updated", relative, updated, canonicalUrl);
+    logResult("Updated", relative, updated, fallbackUrl);
   } else {
     const createPayload = item.payload.slugTitle
       ? { article: { ...item.payload.article, title: item.payload.slugTitle } }
@@ -221,9 +217,9 @@ for (const item of planned) {
         method: "PUT",
         body: JSON.stringify({ article: item.payload.article }),
       });
-      logResult("Created", relative, updated, canonicalUrl);
+      logResult("Created", relative, updated, fallbackUrl);
     } else {
-      logResult("Created", relative, created, canonicalUrl);
+      logResult("Created", relative, created, fallbackUrl);
     }
   }
 }
