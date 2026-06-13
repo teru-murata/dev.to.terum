@@ -1,5 +1,6 @@
 ---
 title: DDD-Shaped Bureaucracy Is Dying
+slug_title: ddd-bureaucracy-ai
 published: false
 tags: ai, architecture, management, ddd
 canonical_url: https://zenn.dev/teru_m/articles/ddd-bureaucracy-ai

@@ -23,6 +23,7 @@ Each file must start with front matter:
 ```yaml
 ---
 title: DDD Isn't Dead. DDD-Shaped Bureaucracy Is.
+slug_title: ddd-bureaucracy-ai
 published: false
 tags: ai, architecture, management, ddd
 canonical_url: https://zenn.dev/teru_m/articles/ddd-bureaucracy-ai
@@ -31,5 +32,7 @@ description: Optional short description.
 ```
 
 The workflow matches existing dev.to articles by `canonical_url`. If an article already exists, it updates it. If not, it creates a new draft or published article depending on `published`.
+
+`slug_title` is optional. dev.to does not expose a first-class slug field through the public API. When `slug_title` is present and the article is newly created, the workflow first creates the draft with `slug_title`, then immediately updates it to the real `title`. This keeps the generated dev.to slug short while preserving the visible title.
 
 Keep `published: false` until the translated article is ready.

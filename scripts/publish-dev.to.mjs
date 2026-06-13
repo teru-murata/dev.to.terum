@@ -99,6 +99,7 @@ function payloadFor(filePath, parsed) {
       series: data.series ?? undefined,
       main_image: data.main_image ?? undefined,
     },
+    slugTitle: data.slug_title ?? null,
   };
 }
 
@@ -161,7 +162,8 @@ for (const file of files) {
 
 if (dryRun) {
   for (const item of planned) {
-    console.log(`[dry-run] ${path.relative(root, item.file)} -> ${item.payload.article.title}`);
+    const slugText = item.payload.slugTitle ? ` slug_title=${item.payload.slugTitle}` : "";
+    console.log(`[dry-run] ${path.relative(root, item.file)} -> ${item.payload.article.title}${slugText}`);
   }
   process.exit(0);
 }
@@ -188,14 +190,25 @@ for (const item of planned) {
   if (existing) {
     const updated = await devToFetch(`/articles/${existing.id}`, {
       method: "PUT",
-      body: JSON.stringify(item.payload),
+      body: JSON.stringify({ article: item.payload.article }),
     });
     logResult("Updated", relative, updated, canonicalUrl);
   } else {
+    const createPayload = item.payload.slugTitle
+      ? { article: { ...item.payload.article, title: item.payload.slugTitle } }
+      : { article: item.payload.article };
     const created = await devToFetch("/articles", {
       method: "POST",
-      body: JSON.stringify(item.payload),
+      body: JSON.stringify(createPayload),
     });
-    logResult("Created", relative, created, canonicalUrl);
+    if (item.payload.slugTitle && created.id) {
+      const updated = await devToFetch(`/articles/${created.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ article: item.payload.article }),
+      });
+      logResult("Created", relative, updated, canonicalUrl);
+    } else {
+      logResult("Created", relative, created, canonicalUrl);
+    }
   }
 }
