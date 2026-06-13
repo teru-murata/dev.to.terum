@@ -35,4 +35,6 @@ The workflow matches existing dev.to articles by `canonical_url`. If an article 
 
 `slug_title` is optional. dev.to does not expose a first-class slug field through the public API. When `slug_title` is present and the article is newly created, the workflow first creates the draft with `slug_title`, then immediately updates it to the real `title`. This keeps the generated dev.to slug short while preserving the visible title.
 
+The workflow fails if `title` contains non-ASCII characters. It also fails if `slug_title` is not lowercase ASCII kebab-case.
+
 Keep `published: false` until the translated article is ready.

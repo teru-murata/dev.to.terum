@@ -83,10 +83,25 @@ function normalizeTags(tags) {
   return "";
 }
 
+function assertAsciiTitle(filePath, title) {
+  if (/[^\x20-\x7E]/.test(title)) {
+    throw new Error(`${filePath}: title must be ASCII-only for stable dev.to URL generation`);
+  }
+}
+
+function assertSlugTitle(filePath, slugTitle) {
+  if (slugTitle == null) return;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slugTitle)) {
+    throw new Error(`${filePath}: slug_title must be lowercase ASCII kebab-case`);
+  }
+}
+
 function payloadFor(filePath, parsed) {
   const { data, body } = parsed;
   if (!data.title) throw new Error(`${filePath}: title is required`);
   if (!data.canonical_url) throw new Error(`${filePath}: canonical_url is required`);
+  assertAsciiTitle(filePath, data.title);
+  assertSlugTitle(filePath, data.slug_title);
 
   return {
     article: {
