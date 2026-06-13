@@ -168,6 +168,18 @@ if (dryRun) {
 
 const existingByCanonical = await existingArticlesByCanonicalUrl();
 
+function logResult(action, relative, article, fallbackUrl) {
+  const url = article.url ?? fallbackUrl;
+  const idText = article.id ? ` id=${article.id}` : "";
+  if (article.published) {
+    console.log(`${action} ${relative}:${idText} published at ${url}`);
+  } else {
+    console.log(`${action} ${relative}:${idText} saved as dev.to draft.`);
+    console.log(`Drafts are not public; ${url} may return 404 until published.`);
+    console.log("Open https://dev.to/dashboard to review unpublished articles.");
+  }
+}
+
 for (const item of planned) {
   const relative = path.relative(root, item.file);
   const canonicalUrl = item.payload.article.canonical_url;
@@ -178,12 +190,12 @@ for (const item of planned) {
       method: "PUT",
       body: JSON.stringify(item.payload),
     });
-    console.log(`Updated ${relative}: ${updated.url ?? canonicalUrl}`);
+    logResult("Updated", relative, updated, canonicalUrl);
   } else {
     const created = await devToFetch("/articles", {
       method: "POST",
       body: JSON.stringify(item.payload),
     });
-    console.log(`Created ${relative}: ${created.url ?? canonicalUrl}`);
+    logResult("Created", relative, created, canonicalUrl);
   }
 }
