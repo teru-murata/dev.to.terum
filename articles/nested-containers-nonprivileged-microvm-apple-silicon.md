@@ -3,7 +3,7 @@ title: Running a container inside a non-privileged microVM, on an Apple Silicon 
 slug_title: nested-containers-nonprivileged-microvm-apple-silicon
 devto_id: 3902392
 published: false
-description: To run untrusted AI-agent code safely you need a real VM boundary. To run its tests you need Docker inside that VM. Without privileged. Here is the recipe that works — and the 12 errors behind it — reproduced locally on an M5.
+description: To run untrusted AI-agent code safely you need a real VM boundary; to run its tests you need Docker inside that VM, without privileged. The recipe, and the 12 errors behind it. Only 2 are Apple-specific — the other 10 hit any Kata + nested-container setup, x86 included.
 tags: containers, kubernetes, docker, security
 ---
 
@@ -20,6 +20,12 @@ is exactly the isolation hole the VM was supposed to close.
 So: nested containers, inside a microVM, with `privileged: false`. Here is the recipe that works. I
 reproduced the whole thing **locally on an Apple M5**, because M3+ Macs quietly grew nested
 virtualization — your laptop can now run a KVM-accelerated microVM that runs Docker.
+
+> **Most of this is not about Macs.** Only errors 1–2 (the host-virt layer) are Apple-specific.
+> Errors 3–12 — the privilege model, cgroup2 delegation, OCI runtime, storage driver, networking —
+> are identical on any x86 Kata node, in the cloud or in CI. The Mac is just the cheapest place to
+> reproduce them. If you landed here from an error message on a Linux box, jump to the list — your
+> fix is in there.
 
 ## The recipe (this is the part that works)
 
