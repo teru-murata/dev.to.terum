@@ -220,9 +220,26 @@ for (const item of planned) {
   const fallbackUrl = item.payload.article.canonical_url;
 
   if (item.payload.devtoId) {
+    // Publishing is monotonic: the repo flag may PUBLISH, never UN-PUBLISH. You can publish from the
+    // dev.to UI too, and a repo `published: false` must not revert a live article back to a draft.
+    let article = item.payload.article;
+    if (article.published === false) {
+      try {
+        const current = await devToFetch(`/articles/${item.payload.devtoId}`);
+        if (current && current.published) {
+          article = { ...article, published: true };
+          console.log(`${relative}: already published on dev.to — keeping it published (not reverting to draft).`);
+        }
+      } catch {
+        // If we can't read the current state, fall back to a content-only update that does not
+        // touch the published flag, so we still never accidentally un-publish.
+        const { published, ...rest } = article;
+        article = rest;
+      }
+    }
     const updated = await devToFetch(`/articles/${item.payload.devtoId}`, {
       method: "PUT",
-      body: JSON.stringify({ article: item.payload.article }),
+      body: JSON.stringify({ article }),
     });
     logResult("Updated", relative, updated, fallbackUrl);
   } else {
