@@ -107,7 +107,6 @@ function assertDevtoId(filePath, devtoId) {
 function payloadFor(filePath, parsed) {
   const { data, body } = parsed;
   if (!data.title) throw new Error(`${filePath}: title is required`);
-  if (!data.canonical_url) throw new Error(`${filePath}: canonical_url is required`);
   assertAsciiTitle(filePath, data.title);
   assertSlugTitle(filePath, data.slug_title);
   assertDevtoId(filePath, data.devto_id);
