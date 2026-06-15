@@ -111,17 +111,21 @@ function payloadFor(filePath, parsed) {
   assertSlugTitle(filePath, data.slug_title);
   assertDevtoId(filePath, data.devto_id);
 
+  const article = {
+    title: data.title,
+    body_markdown: body,
+    published: data.published === true,
+    tags: normalizeTags(data.tags),
+  };
+  // Optional fields are sent ONLY when set in the repo, so an update never clears a value you added
+  // on dev.to by hand — most importantly a manually-uploaded header/cover image (main_image).
+  if (data.canonical_url) article.canonical_url = data.canonical_url;
+  if (data.description) article.description = data.description;
+  if (data.series) article.series = data.series;
+  if (data.main_image) article.main_image = data.main_image;
+
   return {
-    article: {
-      title: data.title,
-      body_markdown: body,
-      published: data.published === true,
-      tags: normalizeTags(data.tags),
-      canonical_url: data.canonical_url,
-      description: data.description ?? undefined,
-      series: data.series ?? undefined,
-      main_image: data.main_image ?? undefined,
-    },
+    article,
     slugTitle: data.slug_title ?? null,
     devtoId: data.devto_id ?? null,
   };
