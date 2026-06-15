@@ -1,6 +1,7 @@
 ---
 title: Running a container inside a non-privileged microVM, on an Apple Silicon Mac
 slug_title: nested-containers-nonprivileged-microvm-apple-silicon
+devto_id: 3902392
 published: false
 description: To run untrusted AI-agent code safely you need a real VM boundary. To run its tests you need Docker inside that VM. Without privileged. Here is the recipe that works — and the 12 errors behind it — reproduced locally on an M5.
 tags: containers, kubernetes, docker, security
