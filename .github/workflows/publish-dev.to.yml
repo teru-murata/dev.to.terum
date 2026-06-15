@@ -19,13 +19,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0          # need history to diff the push
 
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
           node-version: "22"
 
+      - name: Scope to the articles changed in this push
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            BEFORE='${{ github.event.before }}'
+            if git cat-file -e "${BEFORE}^{commit}" 2>/dev/null; then
+              CHANGED=$(git diff --name-only "$BEFORE" "${{ github.sha }}" -- 'articles/*.md' | sort -u | tr '\n' ' ')
+            else
+              CHANGED=$(git diff --name-only HEAD~1 HEAD -- 'articles/*.md' | sort -u | tr '\n' ' ')
+            fi
+            echo "Changed articles: ${CHANGED:-<none>}"
+            echo "CHANGED_ARTICLES=${CHANGED}" >> "$GITHUB_ENV"
+            echo "SYNC_ALL=false" >> "$GITHUB_ENV"
+          else
+            echo "Manual dispatch: full re-sync."
+            echo "SYNC_ALL=true" >> "$GITHUB_ENV"
+          fi
+
       - name: Publish or update dev.to articles
         run: node scripts/publish-dev.to.mjs
         env:
           DEVTO_API_KEY: ${{ secrets.DEVTO_API_KEY }}
+          CHANGED_ARTICLES: ${{ env.CHANGED_ARTICLES }}
+          SYNC_ALL: ${{ env.SYNC_ALL }}

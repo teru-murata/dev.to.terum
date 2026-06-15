@@ -163,9 +163,22 @@ async function devToFetch(pathname, options = {}, attempt = 1) {
   return json;
 }
 
-const files = await listMarkdownFiles(articlesDir);
+let files = await listMarkdownFiles(articlesDir);
+
+// Only sync the articles that changed in this push (CHANGED_ARTICLES, set by the workflow), so
+// editing one article never re-pushes — and never reverts — the others on dev.to. A manual
+// workflow_dispatch sets SYNC_ALL=true for a deliberate full re-sync.
+if (process.env.SYNC_ALL !== "true") {
+  const changed = (process.env.CHANGED_ARTICLES ?? "").trim();
+  const changedSet = new Set(
+    changed ? changed.split(/\s+/).filter(Boolean).map((p) => path.resolve(root, p)) : []
+  );
+  files = files.filter((f) => changedSet.has(path.resolve(f)));
+  console.log(`Scoped to ${files.length} changed article(s)${changed ? `: ${changed}` : ""}.`);
+}
+
 if (files.length === 0) {
-  console.log("No dev.to article files found.");
+  console.log("No dev.to article files to sync.");
   process.exit(0);
 }
 
