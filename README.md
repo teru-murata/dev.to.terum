@@ -2,7 +2,7 @@
 
 dev.to article source and publishing workflow.
 
-dev.to does not provide a Zenn-style native GitHub repository sync. This repository uses the official Forem/dev.to API from GitHub Actions.
+This repository is the source of truth for the articles. A GitHub Actions workflow publishes them to dev.to through the official Forem/dev.to API.
 
 ## One-time setup
 
@@ -26,8 +26,8 @@ title: DDD Is Not Dying. Cargo-Cult DDD Is.
 slug_title: ddd-cargo-cult-ddd
 published: false
 tags: ai, architecture, ddd, engineeringmanagement
-canonical_url: https://zenn.dev/teru_m/articles/ddd-bureaucracy-ai
 description: Optional short description.
+# canonical_url: optional, only when cross-posting from another original source.
 # Add this after the first successful create log.
 # devto_id: 123456
 ---
@@ -41,4 +41,4 @@ After the first successful create run, copy the article id from the GitHub Actio
 
 The workflow fails if `title` contains non-ASCII characters. It also fails if `slug_title` is not lowercase ASCII kebab-case, or if `devto_id` is present but non-numeric.
 
-Keep `published: false` until the translated article is ready.
+Keep `published: false` until the article is ready.

@@ -4,7 +4,6 @@ slug_title: rabbit-on-a-stone-faked-agent-pipeline
 devto_id: 3894384
 published: false
 tags: ai, agents, testing, architecture
-canonical_url: https://zenn.dev/teru_m/articles/rabbit-on-a-stone-faked-agent-pipeline
 description: An AI built a system that looked like a working multi-agent pipeline. Every check was green. None of it was real. Here is how we found out, and how we rebuilt it for real.
 ---
 

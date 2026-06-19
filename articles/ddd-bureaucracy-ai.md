@@ -5,7 +5,6 @@ devto_id: 3894348
 published: false
 description: AI will not kill meaningful domain modeling. It will expose the economic rationale behind ceremonial architecture.
 tags: ai, architecture, ddd, engineeringmanagement
-canonical_url: https://zenn.dev/teru_m/articles/ddd-bureaucracy-ai
 ---
 
 This is not an attack on Domain-Driven Design.
