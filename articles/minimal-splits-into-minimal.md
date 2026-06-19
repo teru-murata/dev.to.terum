@@ -2,8 +2,7 @@
 title: "When 'Minimal' Splits Into 'Minimal': The Particle Physics of AI Task Decomposition"
 slug_title: minimal-splits-into-minimal
 published: false
-tags: ai, agents, architecture, recursion
-canonical_url: https://zenn.dev/teru_m/articles/minimal-splits-into-minimal
+tags: ai, llm, agents, architecture
 description: An autonomous build agent kept declaring a task "minimal" and then splitting it into more "minimal" tasks — atom, proton, quark, forever. The bug, and the one-line idea that fixed it, are both more interesting than they look.
 ---
 
